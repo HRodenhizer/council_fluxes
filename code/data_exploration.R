@@ -13,24 +13,10 @@ library(tidyverse)
 ### Load Data ##################################################################
 # Info about variables and units:
 # https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/
-council_hh <- fread('/home/hrodenhizer/Documents/permafrost_pathways/tower_network/council_fluxes/data/AMF_US-NGC_FLUXNET_FULLSET_HH_2017-2019_3-5.csv',
+council_hh <- fread('data/AMF_US-NGC_BASE_HH_2-5.csv',
                     na.strings = c(-9999, 'NA'))
 council_hh[, ':=' (TIMESTAMP_START = ymd_hm(TIMESTAMP_START),
                    TIMESTAMP_END = ymd_hm(TIMESTAMP_END))]
-council_hh[
-  , 
-  names(council_hh)[
-    str_detect(names(council_hh), 'QC')
-    ] := lapply(.SD, function(x) factor(x)),
-  .SDcols = names(council_hh)[
-    str_detect(names(council_hh), 'QC')
-  ]
-]
-council_d <- fread('/home/hrodenhizer/Documents/permafrost_pathways/tower_network/council_fluxes/data/AMF_US-NGC_FLUXNET_FULLSET_DD_2017-2019_3-5.csv',
-                   na.strings = c(-9999, 'NA'))
-council_d[, ':=' (TIMESTAMP = ymd(TIMESTAMP))]
-council_y <- fread('/home/hrodenhizer/Documents/permafrost_pathways/tower_network/council_fluxes/data/AMF_US-NGC_FLUXNET_FULLSET_YY_2017-2019_3-5.csv',
-                   na.strings = c(-9999, 'NA'))
 ################################################################################
 
 ### Plot Meteorological Data ###################################################
@@ -116,30 +102,41 @@ ggplot(council_hh,
        aes(x = WD, y = WS)) +
   geom_point()
 
-### NEE - units umol CO2 m-2 s-1
-# Variable u* threshold
-ggplot(council_hh[NEE_VUT_REF_QC != 3], 
-       aes(x = TIMESTAMP_START, y = NEE_VUT_REF, color = NEE_VUT_REF_QC)) +
+### NEE - units umol FC m-2 s-1
+ggplot(council_hh, 
+       aes(x = TIMESTAMP_START, y = FC)) +
   geom_point()
 
-ggplot(council_hh[NEE_VUT_USTAR50_QC != 3], 
-       aes(x = TIMESTAMP_START, y = NEE_VUT_USTAR50,
-           color = NEE_VUT_USTAR50_QC)) +
+# Air temp
+ggplot(council_hh, 
+       aes(x = TA, y = FC)) +
   geom_point()
 
 # Wind direction
-ggplot(council_hh[NEE_VUT_REF_QC != 3], 
-       aes(x = WD, y = NEE_VUT_USTAR50,
+ggplot(council_hh, 
+       aes(x = WD, y = FC,
            color = month(TIMESTAMP_START))) +
   geom_point() +
   scale_color_viridis()
 
+ggplot(council_hh, 
+       aes(x = WD, y = FC)) +
+  geom_point() +
+  scale_color_viridis() +
+  facet_wrap(~ month(TIMESTAMP_START))
+
 # Wind speed
-ggplot(council_hh[NEE_VUT_REF_QC != 3], 
-       aes(x = WS, y = NEE_VUT_USTAR50,
+ggplot(council_hh, 
+       aes(x = WS, y = FC,
            color = month(TIMESTAMP_START))) +
   geom_point() +
   scale_color_viridis()
+
+ggplot(council_hh, 
+       aes(x = WS, y = FC)) +
+  geom_point() +
+  scale_color_viridis() +
+  facet_wrap(~ month(TIMESTAMP_START))
 
 ### Reco
 ## Daytime method (Lasslop et al. 2010)
