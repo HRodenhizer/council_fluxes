@@ -17,6 +17,45 @@ council_hh <- fread('data/AMF_US-NGC_BASE_HH_2-5.csv',
                     na.strings = c(-9999, 'NA'))
 council_hh[, ':=' (TIMESTAMP_START = ymd_hm(TIMESTAMP_START),
                    TIMESTAMP_END = ymd_hm(TIMESTAMP_END))]
+
+# soil sensors
+filenames <- list.files('/home/hrodenhizer/Documents/permafrost_pathways/tower_network/council_tower/soil_temp_moisture/raw',
+                        pattern = '^C',
+                        full.names = TRUE)
+
+
+### Figure out the issue with some of the csv files (something with quoted column names, I think)
+import_soil_data <- function(filename) {
+  short_name <- str_split(filename, '/')[[1]]
+  short_name <- short_name[length(short_name)]
+  print(paste('Reading in', short_name))
+  
+  # Get name of sensor_name
+  sensor_name <- as.character(fread(filename, skip = 'area_code:', nrows = 1, header = FALSE)[, .(V2)])
+  # remove trailing underscores from sensor_name
+  if (str_sub(sensor_name, str_length(sensor_name)) == '_') {
+    sensor_name <- str_sub(sensor_name, 1, str_length(sensor_name) - 1)
+  }
+  # remove quotes from sensor_name
+  if (str_sub(sensor_name, 1, 1) == ' ') {
+    sensor_name <- str_sub(sensor_name, 4, str_length(sensor_name) - 2)
+  }
+  print(sensor_name)
+  data <- fread(filename, 
+                skip = 'Date', 
+                select = seq(1, 9))
+  # data <- melt(data,
+  #              id.vars = c('Date'),
+  #              measure.vars = patterns(tsoil = '^Tsoil.+',
+  #                                      vwc = '^VWC.+'),
+  #              variable.name = 'depth')
+  # data[, sensor_name := sensor_name]
+  # data <- data[, .(sensor_name, date = Date, depth, tsoil, vwc)]
+  return(data)
+}
+
+soil_sensor <- map(filenames,
+                   ~ import_soil_data(.x))
 ################################################################################
 
 ### Plot Meteorological Data ###################################################
