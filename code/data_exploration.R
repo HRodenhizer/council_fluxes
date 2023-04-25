@@ -141,7 +141,7 @@ ggplot(council_hh,
        aes(x = WD, y = WS)) +
   geom_point()
 
-### NEE - units umol FC m-2 s-1
+### NEE - units umol C m-2 s-1
 ggplot(council_hh, 
        aes(x = TIMESTAMP_START, y = FC)) +
   geom_point()
