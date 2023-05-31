@@ -1,0 +1,23 @@
+# Create a Thermokarst Map for Council
+
+## Load Packages
+```{r}
+library(thermokarstdetection)
+library(raster)
+library(terra)
+```
+
+## Load Data
+```{r}
+elev <- trim(rast('../council_tower/lidar_rasters/CNCL_GEG_01M.tif'))
+plot(elev)
+```
+
+## Run Thermokarst Detection
+This will be very slow!
+
+```{r}
+
+tk <- tk_detect(raster(elev))
+```
+
