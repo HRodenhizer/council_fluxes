@@ -12,4 +12,7 @@ tower_loc <- st_sf(geometry = st_sfc(st_point(c(-163.7002, 64.8618)),
                                      crs = 4326))
 st_write(tower_loc,
          'data/US-NGC_tower_location.shp')
+st_write(tower_loc,
+         'data/US-NGC_tower_location.kml')
+
 ################################################################################
